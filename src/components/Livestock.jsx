@@ -34,7 +34,10 @@ export default function Livestock({ language, apiKey, simulatedMode, addLog }) {
   // --- Chat state ---
   const [inputText, setInputText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => {
+    const saved = sessionStorage.getItem('livestockChat');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
 
@@ -54,8 +57,23 @@ export default function Livestock({ language, apiKey, simulatedMode, addLog }) {
         mr: "नमस्कार! कोंबडीची लक्षणे सांगा (उदा. 'मान वर करून श्वास', 'हिरवे जुलाब', 'मान वाकडी')."
       }
     };
-    setMessages([{ sender: 'bot', text: language === 'en' ? defaultWelcome[selectedAnimal].en : defaultWelcome[selectedAnimal].mr }]);
+    
+    setMessages(prev => {
+      const welcomeText = language === 'en' ? defaultWelcome[selectedAnimal].en : defaultWelcome[selectedAnimal].mr;
+      if (prev.length === 0) return [{ sender: 'bot', text: welcomeText }];
+      
+      const newArr = [...prev];
+      if (newArr[0]?.sender === 'bot') {
+        newArr[0].text = welcomeText;
+      }
+      return newArr;
+    });
   }, [selectedAnimal, language]);
+
+  // Persist chat
+  useEffect(() => {
+    sessionStorage.setItem('livestockChat', JSON.stringify(messages));
+  }, [messages]);
 
   // Reset scanner when animal changes
   useEffect(() => {

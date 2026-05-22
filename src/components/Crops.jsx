@@ -12,7 +12,10 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
   const [scanResult, setScanResult] = useState(null);
 
   // --- Chat State ---
-  const [chatMessages, setChatMessages] = useState([]);
+  const [chatMessages, setChatMessages] = useState(() => {
+    const saved = sessionStorage.getItem('cropsChat');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
   const [isMicRecording, setIsMicRecording] = useState(false);
@@ -25,11 +28,20 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
       ? `Hello${farmerProfile ? `, ${farmerProfile.name}` : ''}! I am your Crop Advisor AI. Ask me anything about fertilizers, watering, pest control, spacing, or composting for your crops.`
       : `नमस्कार${farmerProfile ? `, ${farmerProfile.name}` : ''}! मी तुमचा पीक सल्लागार AI आहे. खत, पाणी, कीड नियंत्रण, अंतर किंवा सेंद्रिय खतासंबंधी कोणताही प्रश्न विचारा.`;
     
-    // Reset chat history when language changes so it doesn't mix languages
-    if (activeTab === 'chat') {
-      setChatMessages([{ sender: 'bot', text: welcome }]);
-    }
-  }, [activeTab, language]);
+    setChatMessages(prev => {
+      if (prev.length === 0) return [{ sender: 'bot', text: welcome }];
+      const newArr = [...prev];
+      if (newArr[0]?.sender === 'bot') {
+        newArr[0].text = welcome;
+      }
+      return newArr;
+    });
+  }, [language, farmerProfile]);
+
+  // Persist chat
+  useEffect(() => {
+    sessionStorage.setItem('cropsChat', JSON.stringify(chatMessages));
+  }, [chatMessages]);
 
   // Auto-scroll chat
   useEffect(() => {
