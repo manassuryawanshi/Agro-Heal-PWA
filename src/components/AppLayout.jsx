@@ -1,0 +1,208 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Home, CloudRain, TrendingUp, Newspaper, Globe, X, Scan, Sprout, PawPrint, Menu } from 'lucide-react';
+
+const LONG_PRESS_MS = 600;
+
+export default function AppLayout({ currentTab, setCurrentTab, language, setLanguage, farmerProfile, onEditProfile, children }) {
+  const [fabOpen, setFabOpen] = useState(false);
+  const [lastFabTab, setLastFabTab] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // For mobile sidebar toggle if needed
+  
+  const longPressTimer = useRef(null);
+  const isLongPress    = useRef(false);
+  const [pressing, setPressing] = useState(false);
+
+  useEffect(() => {
+    if (currentTab === 'crops' || currentTab === 'livestock') {
+      setLastFabTab(currentTab);
+    }
+  }, [currentTab]);
+
+  // ── FAB handlers ──
+  const startPress = () => {
+    isLongPress.current = false;
+    setPressing(true);
+    longPressTimer.current = setTimeout(() => {
+      isLongPress.current = true;
+      setPressing(false);
+      setFabOpen(true);
+    }, LONG_PRESS_MS);
+  };
+
+  const cancelPress = () => {
+    clearTimeout(longPressTimer.current);
+    setPressing(false);
+  };
+
+  const handleFabClick = () => {
+    if (isLongPress.current) {
+      isLongPress.current = false;
+      return;
+    }
+    if (lastFabTab === null) {
+      setFabOpen(true);
+    } else {
+      setCurrentTab(lastFabTab);
+    }
+  };
+
+  const handleSelect = (id) => {
+    setLastFabTab(id);
+    setCurrentTab(id);
+    setFabOpen(false);
+  };
+
+  const getFabIcon = () => {
+    if (fabOpen) return <X size={26} strokeWidth={2.5} color="#fff" />;
+    const active = currentTab === 'crops' || currentTab === 'livestock' ? currentTab : lastFabTab;
+    if (active === 'crops') return <Scan size={26} strokeWidth={2} color="#fff" />;
+    if (active === 'livestock') return <Scan size={26} strokeWidth={2} color="#fff" />;
+    return <Scan size={26} strokeWidth={2} color="#fff" />;
+  };
+
+  const getFabLabel = () => {
+    const active = currentTab === 'crops' || currentTab === 'livestock' ? currentTab : lastFabTab;
+    if (active === 'crops') return language === 'en' ? 'Scan Crop' : 'पीक स्कॅन';
+    if (active === 'livestock') return language === 'en' ? 'Scan Animal' : 'पशू स्कॅन';
+    return language === 'en' ? 'Smart Scan' : 'स्मार्ट स्कॅन';
+  };
+
+  const isFabActive = currentTab === 'crops' || currentTab === 'livestock';
+  const hasProfile  = !!farmerProfile;
+  const avatarLetter = (hasProfile && farmerProfile?.name) ? farmerProfile.name.charAt(0).toUpperCase() : '?';
+
+  const navItems = [
+    { id: 'dashboard', label: { en: 'Home', mr: 'मुख्य' }, icon: Home },
+    { id: 'weather', label: { en: 'Weather', mr: 'हवामान' }, icon: CloudRain },
+    { id: 'scan_divider' }, // placeholder for the scan button in mobile
+    { id: 'rates', label: { en: 'Rates', mr: 'बाजार' }, icon: TrendingUp },
+    { id: 'news', label: { en: 'News', mr: 'बातम्या' }, icon: Newspaper },
+  ];
+
+  return (
+    <div className={`app-shell ${!hasProfile ? 'onboarding-active' : ''}`}>
+      {/* ── DESKTOP SIDEBAR ── */}
+      {hasProfile && (
+        <aside className="desktop-sidebar">
+          <div className="sidebar-brand">
+            <Sprout size={28} color="var(--primary)" />
+            <h2>Agro Heal</h2>
+          </div>
+          
+          <nav className="sidebar-nav">
+            {navItems.map(item => {
+              if (item.id === 'scan_divider') return null;
+              const Icon = item.icon;
+              const isActive = currentTab === item.id;
+              return (
+                <button key={item.id} className={`sidebar-nav-item ${isActive ? 'active' : ''}`} onClick={() => setCurrentTab(item.id)}>
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                  <span>{language === 'en' ? item.label.en : item.label.mr}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          <div className="sidebar-bottom">
+            <button className="sidebar-scan-btn" onClick={() => setFabOpen(true)}>
+              <Scan size={20} color="#fff" />
+              <span>{language === 'en' ? 'Smart AI Scan' : 'स्मार्ट AI स्कॅन'}</span>
+            </button>
+          </div>
+        </aside>
+      )}
+
+      {/* ── MAIN CONTENT AREA ── */}
+      <main className="app-main-content">
+        {hasProfile && (
+          <header className="app-top-header">
+            <div className="user-profile" onClick={onEditProfile} style={{ cursor: onEditProfile ? 'pointer' : 'default' }}>
+              <div className="user-avatar">{avatarLetter}</div>
+              <div className="user-meta">
+                <h3>{language === 'en' ? `Hello, ${farmerProfile.name}` : `नमस्कार, ${farmerProfile.name}`}</h3>
+                <p>{language === 'en' ? `${farmerProfile.district}, MH` : `${farmerProfile.districtMr}, महा.`}</p>
+              </div>
+            </div>
+            <button className="lang-toggle" onClick={() => setLanguage(l => l === 'en' ? 'mr' : 'en')}>
+              <Globe size={13} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+              {language === 'en' ? 'मराठी' : 'English'}
+            </button>
+          </header>
+        )}
+        
+        <div className="app-scroll-container">
+          {children}
+        </div>
+      </main>
+
+      {/* ── SCAN CHOOSER OVERLAY ── */}
+      {fabOpen && (
+        <div className="fab-chooser-overlay" onClick={() => setFabOpen(false)}>
+          <div className="fab-chooser-cards" onClick={e => e.stopPropagation()}>
+            <p className="fab-chooser-hint">
+              {language === 'en' ? 'What would you like to scan?' : 'तुम्हाला काय स्कॅन करायचे आहे?'}
+            </p>
+
+            <button className="fab-chooser-card crops-card" onClick={() => handleSelect('crops')}>
+              <div className="fab-chooser-icon">
+                <Sprout size={36} color="#fff" strokeWidth={1.8} />
+              </div>
+              <div className="fab-chooser-text">
+                <h3>{language === 'en' ? 'Crop Scanner' : 'पीक स्कॅनर'}</h3>
+                <p>{language === 'en' ? 'Scan diseases · AI Chat' : 'रोग तपासणी · AI सल्ला'}</p>
+              </div>
+            </button>
+
+            <button className="fab-chooser-card livestock-card" onClick={() => handleSelect('livestock')}>
+              <div className="fab-chooser-icon">
+                <PawPrint size={36} color="#fff" strokeWidth={1.8} />
+              </div>
+              <div className="fab-chooser-text">
+                <h3>{language === 'en' ? 'Livestock Scanner' : 'पशूधन स्कॅनर'}</h3>
+                <p>{language === 'en' ? 'Photo diagnosis · Vet AI Chat' : 'फोटो निदान · पशुवैद्य AI चॅट'}</p>
+              </div>
+            </button>
+            <button className="fab-chooser-close-hint" onClick={() => setFabOpen(false)}>
+              {language === 'en' ? 'Tap anywhere to close' : 'बंद करण्यासाठी बाहेर टॅप करा'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── MOBILE BOTTOM NAV ── */}
+      {hasProfile && (
+        <nav className="mobile-bottom-nav">
+          {navItems.map((item, idx) => {
+            if (item.id === 'scan_divider') {
+              return (
+                <div key="scan" className="nav-fab-wrapper">
+                  {pressing && <div className="fab-press-ring" />}
+                  <button
+                    className={`nav-fab ${fabOpen ? 'fab-open' : ''} ${isFabActive ? 'fab-active-glow' : ''} ${pressing ? 'fab-pressing' : ''}`}
+                    onMouseDown={startPress} onMouseUp={cancelPress} onMouseLeave={cancelPress}
+                    onTouchStart={startPress} onTouchEnd={cancelPress}
+                    onClick={handleFabClick}
+                  >
+                    {getFabIcon()}
+                  </button>
+                  <span className={`nav-fab-label ${isFabActive ? 'active' : ''}`}>
+                    {getFabLabel()}
+                  </span>
+                </div>
+              );
+            }
+            
+            const Icon = item.icon;
+            const isActive = currentTab === item.id;
+            return (
+              <button key={item.id} className={`mobile-nav-item ${isActive ? 'active' : ''}`} onClick={() => setCurrentTab(item.id)}>
+                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                <span>{language === 'en' ? item.label.en : item.label.mr}</span>
+              </button>
+            );
+          })}
+        </nav>
+      )}
+    </div>
+  );
+}
