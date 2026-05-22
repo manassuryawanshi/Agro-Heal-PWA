@@ -278,8 +278,9 @@ export default function App() {
         }}
       >
         {renderScreen()}
+      </AppLayout>
 
-        {/* Profile Edit Modal Overlay */}
+      {/* Profile Edit Modal Overlay */}
         {isEditingProfile && (
           <div className="profile-edit-overlay">
             <div className="profile-edit-modal">
@@ -399,7 +400,6 @@ export default function App() {
             </div>
           </div>
         )}
-      </AppLayout>
     </>
   );
 }
