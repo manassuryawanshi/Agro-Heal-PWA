@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Home, CloudRain, TrendingUp, Newspaper, Globe, X, Scan, Sprout, PawPrint, Menu } from 'lucide-react';
 
-const LONG_PRESS_MS = 600;
+const LONG_PRESS_MS = 300;
 
 export default function AppLayout({ currentTab, setCurrentTab, language, setLanguage, farmerProfile, onEditProfile, onSecretUnlock, children }) {
   const [fabOpen, setFabOpen] = useState(false);
