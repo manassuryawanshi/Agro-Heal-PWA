@@ -1,4 +1,4 @@
-# 🌿 Agro Heal — Smart Farming Assistant
+# Agro Heal — Smart Farming Assistant
 
 > **Empowering Maharashtra's Farmers · Built with React + Vite + Gemini AI**
 
@@ -10,11 +10,11 @@
 
 ---
 
-## 📱 What Is Agro Heal?
+## What Is Agro Heal?
 
 **Agro Heal** is a bilingual (English & Marathi) web application designed specifically for farmers across Maharashtra. It brings together crop disease detection, live APMC market rates, localized weather forecasts, livestock health diagnostics, and farming news into a single, accessible platform. We built it as a mobile-first Progressive Web App (PWA) so farmers don't have to download anything—they just open the link and start using it.
 
-### 🎯 Problem We Solve
+### Problem We Solve
 
 | Problem | Our Solution |
 |---|---|
@@ -27,37 +27,37 @@
 
 ---
 
-## ✨ Features
+## Features
 
-### 🏠 Personalized Home Screen
+### Personalized Home Screen
 - Farmer profile onboarding (Name, District, Multi-crop selection)
 - Live APMC market ticker scrolling at top
 - My district crop rate widget
 - Personalized crop advisory alerts
 - Global search across diseases, rates, and news
-- Marathi ↔ English toggle at any time
+- Marathi English toggle at any time
 
-### 🌤️ Weather Section
+### ️ Weather Section
 - District-specific weather forecast
 - Farming-optimized metrics (soil moisture, UV index, wind, humidity)
 - 7-day forecast with week-view tabs
 - Rain map iframe (IMD Doppler link)
 - Color-coded farming recommendations
 
-### 🌿 Crops (via FAB button)
+### Crops (via FAB button)
 - **AI Disease Scanner** — Upload leaf photo → Gemini AI diagnoses disease
 - **Sample crop thumbnails** — Quick diagnosis without photo (Cotton, Tomato, Wheat, Rice, Sugarcane)
 - **Crop AI Chat** — Conversational farming advisor (fertilizer, spacing, water, pests)
 - **Product Recommendations** — Real Bayer/BASF/UPL products with dosage info
 - Voice input simulation for queries
 
-### 🐄 Livestock (via FAB button)
+### Livestock (via FAB button)
 - **Photo Diagnosis** — Upload animal photo → Vet AI diagnosis
 - **Sample sick animals** — Lumpy Skin, Mastitis, PPR, Ranikhet quick select
 - **Vet AI Chat** — Describe symptoms → Instant diagnosis with First Aid + Isolation steps
-- Multi-animal support: Cow 🐄, Goat 🐐, Chicken 🐓
+- Multi-animal support: Cow , Goat , Chicken 
 
-### 📊 APMC Rates
+### APMC Rates
 - 15+ Maharashtra district rates
 - Quick filter buttons by crop and region
 - Price trend indicators (↑ ↓) with reasoning
@@ -65,13 +65,13 @@
 - Visual bar charts
 - Market news section
 
-### 📰 News Feed
+### News Feed
 - Local farming news filtered by crop/region
 - Tabs: All · Alerts · Weather · Government · Market Rates
 - Market Rates tab with price trend news
 - Article cards with source, date, and read-more links
 
-### 🔐 Profile System
+### Profile System
 - Slide-up edit modal accessible from header
 - Multi-crop selection (8 crops with emoji grid)
 - Full Maharashtra district dropdown (36 districts)
@@ -79,7 +79,7 @@
 
 ---
 
-## 🚀 Quick Start — Run Locally
+## Quick Start — Run Locally
 
 ### Prerequisites
 - **Node.js** v18+ ([download](https://nodejs.org/))
@@ -99,7 +99,7 @@ npm install
 npm run dev
 
 # 4. Open in browser
-# → http://localhost:5173   (or 5174 if port is in use)
+# → http://localhost:5173 (or 5174 if port is in use)
 ```
 
 ### AI Backend (Gemini Integration)
@@ -117,32 +117,32 @@ npm run build
 
 ---
 
-## 🏗️ Project Architecture
+## ️ Project Architecture
 
 ```
 agro-heal/
-├── index.html                  # App entry point
-├── vite.config.js              # Vite build config
-├── package.json                # Dependencies
+├── index.html # App entry point
+├── vite.config.js # Vite build config
+├── package.json # Dependencies
 └── src/
-    ├── main.jsx                # React root mount
-    ├── App.jsx                 # Global state, routing, profile edit modal
-    ├── App.css                 # Minimal base reset
-    ├── index.css               # Full design system (2000+ lines)
-    │
-    ├── components/
-    │   ├── PhoneBezel.jsx      # Phone frame, nav bar, FAB speed-dial
-    │   ├── PhoneBezel.jsx      # Phone frame, nav bar, FAB speed-dial
-    │   ├── Dashboard.jsx       # Home screen, search, rates widget, advisory
-    │   ├── WeatherMetrics.jsx  # Weather forecast, farming metrics
-    │   ├── Crops.jsx           # Disease scanner + Crop AI chat
-    │   ├── Livestock.jsx       # Photo diagnosis + Vet AI chat
-    │   ├── RateChart.jsx       # APMC rate charts and filters
-    │   └── News.jsx            # News feed with tabs and filtering
-    │       Onboarding.jsx      # First-run profile wizard
-    │
-    └── data/
-        └── mockData.js         # All local data (districts, diseases, rates, news)
+ ├── main.jsx # React root mount
+ ├── App.jsx # Global state, routing, profile edit modal
+ ├── App.css # Minimal base reset
+ ├── index.css # Full design system (2000+ lines)
+ │
+ ├── components/
+ │ ├── PhoneBezel.jsx # Phone frame, nav bar, FAB speed-dial
+ │ ├── PhoneBezel.jsx # Phone frame, nav bar, FAB speed-dial
+ │ ├── Dashboard.jsx # Home screen, search, rates widget, advisory
+ │ ├── WeatherMetrics.jsx # Weather forecast, farming metrics
+ │ ├── Crops.jsx # Disease scanner + Crop AI chat
+ │ ├── Livestock.jsx # Photo diagnosis + Vet AI chat
+ │ ├── RateChart.jsx # APMC rate charts and filters
+ │ └── News.jsx # News feed with tabs and filtering
+ │ Onboarding.jsx # First-run profile wizard
+ │
+ └── data/
+ └── mockData.js # All local data (districts, diseases, rates, news)
 ```
 
 ### State Management
@@ -160,7 +160,7 @@ agro-heal/
 
 ---
 
-## 📊 Data Sources
+## Data Sources
 
 | Data | Source |
 |---|---|
@@ -173,7 +173,7 @@ agro-heal/
 
 ---
 
-## 🛠️ Tech Stack
+## ️ Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -189,7 +189,7 @@ agro-heal/
 
 ---
 
-## 🌐 Localization
+## Localization
 
 The app fully supports **English** and **Marathi (मराठी)** throughout:
 - Toggle button in the app header
@@ -201,7 +201,7 @@ The app fully supports **English** and **Marathi (मराठी)** throughout:
 
 ---
 
-## 🧪 Demo Walkthrough
+## Demo Walkthrough
 
 1. **Open** `http://localhost:5174`
 2. **Onboarding** — Enter name "Ramesh Patil", select "Pune", pick Cotton + Soybean
@@ -217,20 +217,14 @@ The app fully supports **English** and **Marathi (मराठी)** throughout:
 12. **Language** — Toggle to मराठी using the button in the header
 13. **Profile Edit** — Click your name/avatar to edit crops and district
 
----
 
-## 🔮 Roadmap — Next Steps to Reach Users
 
-See `ROADMAP.md` for the complete plan.
-
----
-
-## 👨‍💻 Project Focus
+## ‍ Project Focus
 
 Built with a strong focus on AgriTech to solve real problems for Maharashtra farmers.
 
 ---
 
-## 📄 License
+## License
 
 Licensed under the MIT License.
