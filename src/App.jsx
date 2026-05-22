@@ -288,13 +288,38 @@ export default function App() {
                     </div>
                   </div>
 
-                  <button
-                    className="profile-edit-save-btn"
-                    onClick={handleSaveProfile}
-                    disabled={!editName.trim() || !editDistrict || editCrops.length === 0}
-                  >
-                    {language === 'en' ? 'Save Changes' : 'बदल जतन करा'}
-                  </button>
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+                    <button
+                      className="profile-edit-save-btn"
+                      onClick={handleSaveProfile}
+                      disabled={!editName.trim() || !editDistrict || editCrops.length === 0}
+                      style={{ flex: 1 }}
+                    >
+                      {language === 'en' ? 'Save Changes' : 'बदल जतन करा'}
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (window.confirm(language === 'en' ? 'Are you sure you want to log out?' : 'तुम्हाला नक्की लॉग आउट करायचे आहे का?')) {
+                          setIsEditingProfile(false);
+                          resetFarmerProfile();
+                        }
+                      }}
+                      style={{
+                        padding: '12px',
+                        background: 'transparent',
+                        color: '#ff4757',
+                        border: '1px solid #ff4757',
+                        borderRadius: '12px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {language === 'en' ? 'Log Out' : 'लॉग आउट'}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
