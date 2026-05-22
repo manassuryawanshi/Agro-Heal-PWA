@@ -109,7 +109,7 @@ export default function Livestock({ language, apiKey, simulatedMode, addLog }) {
           const base64Data = reader.result.split(',')[1];
           const prompt = `You are a livestock veterinarian. Analyze this ${selectedAnimal} photo. Output ONLY JSON: {"name":{"en":"","mr":""},"severity":"High/Medium/Low","symptoms":{"en":"","mr":""},"firstAid":{"en":"","mr":""},"isolationSteps":{"en":"","mr":""},"prescription":{"en":"","mr":""}}.`;
           const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey.trim()}`,
             { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: file.type, data: base64Data } }] }] }) }
           );
           if (!response.ok) throw new Error('API fail');
@@ -200,7 +200,7 @@ export default function Livestock({ language, apiKey, simulatedMode, addLog }) {
     try {
       const prompt = `You are a professional veterinary doctor. A farmer reports their ${selectedAnimal} has: "${userMsg}". Output ONLY JSON: {"name":{"en":"","mr":""},"severity":"High/Medium/Low","symptoms":{"en":"","mr":""},"firstAid":{"en":"","mr":""},"isolationSteps":{"en":"","mr":""},"prescription":{"en":"","mr":""}}.`;
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey.trim()}`,
         { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }
       );
       if (!response.ok) throw new Error('Gemini API call failed');
