@@ -10,7 +10,6 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
   const [selectedImage, setSelectedImage] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
-  const [checkoutProduct, setCheckoutProduct] = useState(null);
 
   // --- Chat State ---
   const [chatMessages, setChatMessages] = useState([]);
@@ -49,7 +48,6 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
     setIsScanning(true);
     setSelectedImage(cropKey);
     setScanResult(null);
-    setCheckoutProduct(null);
     addLog(`[Crops ML] Selected sample crop: ${cropKey}. Triggering vision analysis...`, 'info');
     setTimeout(() => {
       const result = cropDiseases[cropKey];
@@ -65,7 +63,6 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
     if (!file) return;
     setSelectedImage(file.name);
     setScanResult(null);
-    setCheckoutProduct(null);
 
     if (simulatedMode || !apiKey) {
       setIsScanning(true);
@@ -130,11 +127,7 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
     }
   };
 
-  // Buy product handler
-  const handleBuyProduct = (product) => {
-    setCheckoutProduct(product);
-    addLog(`[Commerce Engine] Mock order initiated for ${product.brand} ${product.name.en}`, 'success');
-  };
+
 
   // ---- CROP AI CHATBOT ----
   const getLocalAnswer = (question) => {
@@ -378,25 +371,9 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
             </div>
           )}
 
-          {/* Checkout Success */}
-          {checkoutProduct && (
-            <div className="checkout-popup">
-              <div className="checkout-popup-head">
-                <CheckCircle size={18} color="#1E8449" />
-                <h4>{L('Order Placed!', 'ऑर्डर नोंदवली!')}</h4>
-              </div>
-              <p>{L(`1x ${checkoutProduct.name.en} (${checkoutProduct.size}) — delivery in 2 days to ${farmerProfile?.district || 'your district'}.`,
-                `1x ${checkoutProduct.name.mr} (${checkoutProduct.size}) — ${farmerProfile?.districtMr || 'तुमच्या पत्त्यावर'} २ दिवसांत घरपोच.`)}
-              </p>
-              <button className="checkout-popup-close" onClick={() => setCheckoutProduct(null)}>
-                {L('Dismiss', 'बंद करा')}
-              </button>
-            </div>
-          )}
-
           {/* Diagnostic Result */}
           {scanResult && !isScanning && (
-            <div className={`result-card severity-${(scanResult.severity||'low').toLowerCase()}`}>
+            <div className={`result-card severity-${(scanResult.severity||'low').toLowerCase()}`} style={{ marginTop: '24px' }}>
               <div className="result-severity">
                 {(scanResult.severity||'LOW').toUpperCase()} {L('SEVERITY','तीव्रता')}
               </div>
@@ -444,10 +421,13 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
                       </div>
                       <div style={{ textAlign:'right', display:'flex', flexDirection:'column', gap:4, alignItems:'flex-end' }}>
                         <div style={{ fontSize:15, fontWeight:800, color:'var(--brand)' }}>₹{prod.price}</div>
-                        <button onClick={() => handleBuyProduct(prod)}
-                          style={{ background:'var(--brand)', color:'#fff', border:'none', borderRadius:'var(--r-sm)', padding:'5px 10px', fontSize:11, fontWeight:700, cursor:'pointer' }}>
-                          {L('Buy','खरेदी')}
-                        </button>
+                        <a 
+                          href={`https://www.amazon.in/s?k=${encodeURIComponent(prod.brand + ' ' + prod.name.en)}`}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          style={{ textDecoration: 'none', background:'var(--brand)', color:'#fff', border:'none', borderRadius:'var(--r-sm)', padding:'5px 10px', fontSize:11, fontWeight:700, cursor:'pointer', display: 'inline-block' }}>
+                          {L('Buy on Amazon','Amazon वर खरेदी')}
+                        </a>
                       </div>
                     </div>
                   ))}
