@@ -289,7 +289,12 @@ ${content}
 Shared via *Agro Heal* 🌾`;
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(textToShare)}`;
-    window.open(whatsappUrl, '_blank');
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      window.location.href = whatsappUrl;
+    } else {
+      window.open(whatsappUrl, '_blank');
+    }
 
     setWhatsappSharedId(article.id);
     addLog(`[Social Share] Shared to WhatsApp: ${article.title.en}`, 'success');
