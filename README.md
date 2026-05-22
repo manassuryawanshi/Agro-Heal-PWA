@@ -1,8 +1,8 @@
-# 🌿 Agro Heal — AI-Powered Smart Farming Assistant
+# 🌿 Agro Heal — Smart Farming Assistant
 
-> **Hackathon Prototype · Maharashtra Focus · Built with React + Vite + Gemini AI**
+> **Empowering Maharashtra's Farmers · Built with React + Vite + Gemini AI**
 
-![Agro Heal](https://img.shields.io/badge/Status-Hackathon%20Prototype-brightgreen)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 ![React](https://img.shields.io/badge/React-19-blue)
 ![Vite](https://img.shields.io/badge/Vite-5.4-purple)
 ![Gemini](https://img.shields.io/badge/Gemini%20AI-2.0%20Flash-orange)
@@ -12,7 +12,7 @@
 
 ## 📱 What Is Agro Heal?
 
-**Agro Heal** is a bilingual (English + Marathi) smart farming assistant built as a mobile-first web app, designed specifically for farmers across Maharashtra. It combines AI-powered crop disease detection, live APMC market rates, personalized weather forecasts, livestock health diagnostics, and farming news — all in one app accessible on any phone browser without needing to install anything.
+**Agro Heal** is a bilingual (English & Marathi) web application designed specifically for farmers across Maharashtra. It brings together crop disease detection, live APMC market rates, localized weather forecasts, livestock health diagnostics, and farming news into a single, accessible platform. We built it as a mobile-first Progressive Web App (PWA) so farmers don't have to download anything—they just open the link and start using it.
 
 ### 🎯 Problem We Solve
 
@@ -29,7 +29,7 @@
 
 ## ✨ Features
 
-### 🏠 Personalized Dashboard
+### 🏠 Personalized Home Screen
 - Farmer profile onboarding (Name, District, Multi-crop selection)
 - Live APMC market ticker scrolling at top
 - My district crop rate widget
@@ -102,17 +102,11 @@ npm run dev
 # → http://localhost:5173   (or 5174 if port is in use)
 ```
 
-### Optional — Enable Gemini AI (Live Mode)
+### AI Backend (Gemini Integration)
 
-By default the app runs in **Simulated Mode** using local hardcoded data.  
-To enable real Gemini AI responses:
-
-1. Get a free API key from [Google AI Studio](https://aistudio.google.com/)
-2. Open the app → look for the **Control Panel** on the right side of the desktop view
-3. Paste your key into the **API Key** field
-4. The mode auto-switches to **Live Cloud AI**
-
-> ⚠️ Without an API key, all AI features still work using smart local fallback data — perfect for demos.
+We securely integrated Google Gemini 2.0 Flash using serverless environment variables. 
+- In production, it connects seamlessly to the live AI engine.
+- Locally, if `VITE_GEMINI_API_KEY` is not present in your `.env.local`, the application will automatically fall back to local offline data so you can still test the UI without hitting API limits.
 
 ### Build for Production
 
@@ -138,7 +132,7 @@ agro-heal/
     │
     ├── components/
     │   ├── PhoneBezel.jsx      # Phone frame, nav bar, FAB speed-dial
-    │   ├── ControlPanel.jsx    # Dev control panel (API key, logs, mode toggle)
+    │   ├── PhoneBezel.jsx      # Phone frame, nav bar, FAB speed-dial
     │   ├── Dashboard.jsx       # Home screen, search, rates widget, advisory
     │   ├── WeatherMetrics.jsx  # Weather forecast, farming metrics
     │   ├── Crops.jsx           # Disease scanner + Crop AI chat
@@ -154,8 +148,8 @@ agro-heal/
 ### State Management
 - **Global state** lives in `App.jsx` — `farmerProfile`, `language`, `currentTab`, `apiKey`
 - **localStorage** persistence for farmer profile across sessions
-- **Props drilling** used intentionally (no Redux) to keep prototype simple
-- **Simulated vs Live mode** — every AI component checks `simulatedMode` flag
+- **Component state** is passed down intentionally via props to keep the architecture clean and simple without the overhead of Redux.
+- **Offline/Live mode handling** — every AI component seamlessly checks if the API key is present.
 
 ### AI Integration (Gemini 2.0 Flash)
 - Crop disease scanner sends base64 image + prompt → gets JSON diagnosis
@@ -231,12 +225,12 @@ See `ROADMAP.md` for the complete plan.
 
 ---
 
-## 👨‍💻 Team
+## 👨‍💻 Project Focus
 
-Built during **[Hackathon Name]** — focused on AgriTech for Maharashtra farmers.
+Built with a strong focus on AgriTech to solve real problems for Maharashtra farmers.
 
 ---
 
 ## 📄 License
 
-This is a hackathon prototype. Not licensed for commercial use without permission.
+Licensed under the MIT License.

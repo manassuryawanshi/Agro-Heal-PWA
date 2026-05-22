@@ -3,11 +3,30 @@ import { Home, CloudRain, TrendingUp, Newspaper, Globe, X, Scan, Sprout, PawPrin
 
 const LONG_PRESS_MS = 600;
 
-export default function AppLayout({ currentTab, setCurrentTab, language, setLanguage, farmerProfile, onEditProfile, children }) {
+export default function AppLayout({ currentTab, setCurrentTab, language, setLanguage, farmerProfile, onEditProfile, onSecretUnlock, children }) {
   const [fabOpen, setFabOpen] = useState(false);
   const [lastFabTab, setLastFabTab] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // For mobile sidebar toggle if needed
   
+  const [tapCount, setTapCount] = useState(0);
+  const tapTimeout = useRef(null);
+
+  const handleSecretTap = () => {
+    setTapCount(prev => {
+      const newCount = prev + 1;
+      if (newCount >= 5) {
+        if (onSecretUnlock) onSecretUnlock();
+        return 0;
+      }
+      return newCount;
+    });
+
+    if (tapTimeout.current) clearTimeout(tapTimeout.current);
+    tapTimeout.current = setTimeout(() => {
+      setTapCount(0);
+    }, 1000);
+  };
+
   const longPressTimer = useRef(null);
   const isLongPress    = useRef(false);
   const [pressing, setPressing] = useState(false);
@@ -84,7 +103,7 @@ export default function AppLayout({ currentTab, setCurrentTab, language, setLang
       {/* ── DESKTOP SIDEBAR ── */}
       {hasProfile && (
         <aside className="desktop-sidebar">
-          <div className="sidebar-brand">
+          <div className="sidebar-brand" onClick={handleSecretTap} style={{ cursor: 'pointer' }}>
             <Sprout size={28} color="var(--primary)" />
             <h2>Agro Heal</h2>
           </div>
@@ -117,7 +136,7 @@ export default function AppLayout({ currentTab, setCurrentTab, language, setLang
         {hasProfile && (
           <header className="app-top-header">
             <div className="user-profile" onClick={onEditProfile} style={{ cursor: onEditProfile ? 'pointer' : 'default' }}>
-              <div className="user-avatar">{avatarLetter}</div>
+              <div className="user-avatar" onClick={(e) => { e.stopPropagation(); handleSecretTap(); }}>{avatarLetter}</div>
               <div className="user-meta">
                 <h3>{language === 'en' ? `Hello, ${farmerProfile.name}` : `नमस्कार, ${farmerProfile.name}`}</h3>
                 <p>{language === 'en' ? `${farmerProfile.district}, MH` : `${farmerProfile.districtMr}, महा.`}</p>

@@ -7,6 +7,7 @@ import Livestock from './components/Livestock';
 import RateChart from './components/RateChart';
 import News from './components/News';
 import Onboarding from './components/Onboarding';
+import AdminDashboard from './components/AdminDashboard';
 import { maharashtraDistricts } from './data/mockData';
 import { User, MapPin, Leaf, X, CheckCircle, Check } from 'lucide-react';
 import { supabase } from './lib/supabase';
@@ -42,7 +43,7 @@ export default function App() {
   // Initialize and check local storage
   useEffect(() => {
     addLog('System Initialization Successful.', 'success');
-    addLog('Agro Heal Prototype engine successfully initialized on Port 5174.', 'info');
+    addLog('Agro Heal engine successfully initialized on Port 5174.', 'info');
     
     // Check if farmer profile exists
     const storedProfile = localStorage.getItem('farmerProfile');
@@ -177,6 +178,8 @@ export default function App() {
         return <RateChart language={language} addLog={addLog} farmerProfile={farmerProfile} />;
       case 'news':
         return <News language={language} apiKey={apiKey} addLog={addLog} farmerProfile={farmerProfile} />;
+      case 'admin':
+        return <AdminDashboard onClose={() => setCurrentTab('dashboard')} />;
       default:
         return <Dashboard setCurrentTab={setCurrentTab} language={language} farmerProfile={farmerProfile} />;
     }
@@ -202,6 +205,10 @@ export default function App() {
         }}
         farmerProfile={farmerProfile}
         onEditProfile={openEditProfile}
+        onSecretUnlock={() => {
+          setCurrentTab('admin');
+          addLog('[Admin] Secret unlock triggered', 'warning');
+        }}
       >
         {renderScreen()}
 

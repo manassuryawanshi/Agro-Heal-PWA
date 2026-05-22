@@ -1,4 +1,4 @@
-// Mock Database for Agro Heal Local Prototype (English & Marathi support)
+// Mock Database for Agro Heal Local Environment (English & Marathi support)
 
 export const cropDiseases = {
   cotton_blight: {
