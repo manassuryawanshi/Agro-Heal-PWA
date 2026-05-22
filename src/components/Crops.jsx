@@ -99,7 +99,7 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
           try {
             const prompt = `Analyze crop leaf. Output ONLY valid JSON: {"name":{"en":"","mr":""},"scientificName":"","severity":"High|Medium|Low","symptoms":{"en":"","mr":""},"organicRemedy":{"en":"","mr":""},"chemicalRemedy":{"en":"","mr":""},"prevention":{"en":"","mr":""}}`;
             const response = await fetch(
-              `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+              `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
               { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: 'image/jpeg', data: base64Data } }] }] }) }
             );
             if (!response.ok) {
@@ -176,7 +176,7 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
         historyContents.push({ role: 'user', parts: [{ text: userMsg }] });
 
         const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
           { 
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' }, 
@@ -363,7 +363,7 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
 
           {/* Scanning Progress */}
           {isScanning && (
-            <div className="scan-progress">
+            <div className="scan-progress" style={{ marginTop: '24px' }}>
               <div className="scan-progress-icon"><Microscope size={26} /></div>
               <h4>{L('Reading leaf patterns…', 'पानातील रचना तपासत आहे…')}</h4>
               <p>{L('Our AI is analyzing the image for disease markers', 'AI रोग मार्कर ओळखत आहे')}</p>
@@ -420,7 +420,6 @@ export default function Crops({ language, apiKey, simulatedMode, addLog, farmerP
                         <div style={{ fontSize:11, color:'var(--t3)' }}>{prod.size}</div>
                       </div>
                       <div style={{ textAlign:'right', display:'flex', flexDirection:'column', gap:4, alignItems:'flex-end' }}>
-                        <div style={{ fontSize:15, fontWeight:800, color:'var(--brand)' }}>₹{prod.price}</div>
                         <a 
                           href={`https://www.amazon.in/s?k=${encodeURIComponent(prod.brand + ' ' + prod.name.en)}`}
                           target="_blank" 

@@ -11,6 +11,8 @@ import AdminDashboard from './components/AdminDashboard';
 import { maharashtraDistricts } from './data/mockData';
 import { User, MapPin, Leaf, X, CheckCircle, Check } from 'lucide-react';
 import { supabase } from './lib/supabase';
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 // In App.jsx, we just define string keys for icons so they serialize cleanly, 
 // or render them directly if we don't need them in localStorage
@@ -79,6 +81,71 @@ export default function App() {
     const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
     setLogs(prev => [{ time: timeStr, text, level }, ...prev]);
   };
+
+  // Interactive Tutorial
+  useEffect(() => {
+    if (farmerProfile && !isEditingProfile && currentTab === 'dashboard') {
+      const hasSeenTutorial = localStorage.getItem('hasSeenTutorial');
+      if (!hasSeenTutorial) {
+        const isDesktop = window.innerWidth > 768;
+        
+        const d = driver({
+          showProgress: true,
+          animate: true,
+          steps: [
+            {
+              popover: {
+                title: language === 'en' ? 'Welcome to Agro Heal! 🌿' : 'Agro Heal मध्ये आपले स्वागत आहे! 🌿',
+                description: language === 'en' ? 'Let me show you around your new smart farming assistant.' : 'मी तुम्हाला तुमच्या नवीन स्मार्ट फार्मिंग असिस्टंटची ओळख करून देतो.',
+              }
+            },
+            {
+              element: '.user-profile',
+              popover: {
+                title: language === 'en' ? 'Your Profile' : 'तुमचे प्रोफाईल',
+                description: language === 'en' ? 'Click here anytime to edit your profile, update your district, or change your primary crop.' : 'तुमचे प्रोफाईल संपादित करण्यासाठी, जिल्हा अपडेट करण्यासाठी किंवा मुख्य पीक बदलण्यासाठी येथे क्लिक करा.',
+                side: "bottom", align: 'start'
+              }
+            },
+            {
+              element: '.lang-toggle',
+              popover: {
+                title: language === 'en' ? 'Bilingual Support' : 'द्विभाषिक समर्थन',
+                description: language === 'en' ? 'Tap here to instantly switch between English and Marathi.' : 'इंग्रजी आणि मराठी दरम्यान त्वरित बदलण्यासाठी येथे टॅप करा.',
+                side: "bottom", align: 'end'
+              }
+            },
+            {
+              element: isDesktop ? '.sidebar-nav' : '.mobile-bottom-nav',
+              popover: {
+                title: language === 'en' ? 'Navigation Menu' : 'नेव्हिगेशन मेनू',
+                description: language === 'en' ? 'Use these tabs to check APMC Rates, Live Weather, and read the latest Farming News.' : 'APMC दर, थेट हवामान तपासण्यासाठी आणि ताज्या शेतीच्या बातम्या वाचण्यासाठी या टॅबचा वापर करा.',
+                side: isDesktop ? "right" : "top"
+              }
+            },
+            {
+              element: isDesktop ? '.sidebar-scan-btn' : '.nav-fab-wrapper',
+              popover: {
+                title: language === 'en' ? 'Smart AI Scanner 📸' : 'स्मार्ट AI स्कॅनर 📸',
+                description: language === 'en' ? 'This is the most powerful tool! Tap here to scan crops for diseases or consult the AI Livestock Vet.' : 'हे सर्वात शक्तिशाली साधन आहे! रोगांसाठी पिके स्कॅन करण्यासाठी किंवा AI पशूवैद्याचा सल्ला घेण्यासाठी येथे टॅप करा.',
+                side: isDesktop ? "right" : "top"
+              }
+            }
+          ],
+          onDestroyStarted: () => {
+            if (!d.hasNextStep() || window.confirm(language === 'en' ? "Skip the tutorial?" : "ट्यूटोरियल वगळा?")) {
+              d.destroy();
+              localStorage.setItem('hasSeenTutorial', 'true');
+            }
+          },
+        });
+        
+        setTimeout(() => {
+          d.drive();
+        }, 800);
+      }
+    }
+  }, [farmerProfile, isEditingProfile, language, currentTab]);
 
   const clearLogs = () => {
     setLogs([]);

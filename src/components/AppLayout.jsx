@@ -125,7 +125,12 @@ export default function AppLayout({ currentTab, setCurrentTab, language, setLang
           <div className="sidebar-bottom">
             <button className="sidebar-scan-btn" onClick={() => setFabOpen(true)}>
               <Scan size={20} color="#fff" />
-              <span>{language === 'en' ? 'Smart AI Scan' : 'स्मार्ट AI स्कॅन'}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
+                <span style={{ lineHeight: '1.2' }}>{language === 'en' ? 'Smart AI Scan' : 'स्मार्ट AI स्कॅन'}</span>
+                <span style={{ fontSize: '9px', opacity: 0.8, fontWeight: 'normal', lineHeight: '1' }}>
+                  {language === 'en' ? '(Click to choose mode)' : '(मोड निवडण्यासाठी क्लिक करा)'}
+                </span>
+              </div>
             </button>
           </div>
         </aside>
