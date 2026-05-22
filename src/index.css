@@ -727,6 +727,8 @@ button, .chip, .segment-btn, .action-card, .mobile-nav-item {
   aspect-ratio: 1 !important; border-radius:50% !important;
   border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
   transition:var(--t-fast); flex-shrink:0 !important; padding: 0 !important;
+  box-sizing: border-box !important; appearance: none !important; -webkit-appearance: none !important;
+  overflow: hidden !important; outline: none !important;
 }
 .chat-mic-btn  { background:var(--sunken); color:var(--t2); }
 .chat-mic-btn:hover  { background:var(--brand-tint); color:var(--brand); }

@@ -249,15 +249,15 @@ export default function Livestock({ language, apiKey, simulatedMode, addLog }) {
       <h4 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--primary)', marginBottom: '8px' }}>
         {language === 'en' ? disease.name?.en : disease.name?.mr}
       </h4>
-      <div style={{ fontSize: '11px', lineHeight: '1.5', display: 'flex', flexDirection: 'column', gap: '8px', color: 'var(--text-dark)' }}>
-        <p><strong>{language === 'en' ? 'Symptoms: ' : 'लक्षणे: '}</strong>{language === 'en' ? disease.symptoms?.en : disease.symptoms?.mr}</p>
-        <p style={{ background: '#fffbe6', padding: '6px', borderRadius: '4px', borderLeft: '3px solid #ffe58f' }}>
+      <div style={{ fontSize: '12px', lineHeight: '1.6', display: 'flex', flexDirection: 'column', gap: '12px', color: 'var(--text-dark)' }}>
+        <p style={{ margin: 0 }}><strong>{language === 'en' ? 'Symptoms: ' : 'लक्षणे: '}</strong>{language === 'en' ? disease.symptoms?.en : disease.symptoms?.mr}</p>
+        <p style={{ margin: 0, background: '#fffbe6', padding: '8px 10px', borderRadius: '6px', borderLeft: '4px solid #ffe58f' }}>
           <strong>{language === 'en' ? 'First Aid: ' : 'प्रथमोपचार: '}</strong>{language === 'en' ? disease.firstAid?.en : disease.firstAid?.mr}
         </p>
-        <p style={{ background: '#f0f5ff', padding: '6px', borderRadius: '4px', borderLeft: '3px solid #adc6ff' }}>
+        <p style={{ margin: 0, background: '#f0f5ff', padding: '8px 10px', borderRadius: '6px', borderLeft: '4px solid #adc6ff' }}>
           <strong>{language === 'en' ? 'Isolation: ' : 'क्वारंटाईन: '}</strong>{language === 'en' ? disease.isolationSteps?.en : disease.isolationSteps?.mr}
         </p>
-        <p><strong>{language === 'en' ? 'Vet Advisory: ' : 'वैद्यकीय सल्ला: '}</strong>{language === 'en' ? disease.prescription?.en : disease.prescription?.mr}</p>
+        <p style={{ margin: 0 }}><strong>{language === 'en' ? 'Vet Advisory: ' : 'वैद्यकीय सल्ला: '}</strong>{language === 'en' ? disease.prescription?.en : disease.prescription?.mr}</p>
       </div>
     </div>
   );
