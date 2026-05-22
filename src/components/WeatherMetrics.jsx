@@ -435,7 +435,7 @@ export default function WeatherMetrics({ language, addLog, farmerProfile }) {
                 {language === 'en' ? 'Live Doppler Rain Radar (Maharashtra)' : 'थेट मान्सून उपग्रह आणि पाऊस रडार'}
               </h5>
             </div>
-            <div className="radar-iframe-wrapper" style={{ position: 'relative', width: '100%', height: '180px', borderRadius: 'var(--r-md)', overflow: 'hidden', backgroundColor: '#e2e8f0', boxShadow: 'var(--inset)' }}>
+            <div className="radar-iframe-wrapper" style={{ position: 'relative', width: '100%', height: '360px', borderRadius: 'var(--r-md)', overflow: 'hidden', backgroundColor: '#e2e8f0', boxShadow: 'var(--inset)' }}>
               <iframe
                 title="Windy Weather Radar"
                 src={windyEmbedUrl}
