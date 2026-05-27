@@ -147,7 +147,7 @@ export default function AppLayout({ currentTab, setCurrentTab, language, setLang
                 <p>{language === 'en' ? `${farmerProfile.district}, MH` : `${farmerProfile.districtMr}, महा.`}</p>
               </div>
             </div>
-            <div className="lang-switcher-pill" style={{ display: 'flex', background: 'var(--sunken)', borderRadius: '20px', padding: '2px', gap: '2px' }}>
+            <div className="lang-switcher-pill" style={{ display: 'flex', background: 'var(--sunken)', borderRadius: '30px', padding: '3px', gap: '3px', border: '1.5px solid var(--sep-sm)', alignItems: 'center' }}>
               <button 
                 type="button" 
                 onClick={() => setLanguage('en')}
@@ -155,14 +155,18 @@ export default function AppLayout({ currentTab, setCurrentTab, language, setLang
                   border: 'none',
                   background: language === 'en' ? 'var(--brand)' : 'transparent',
                   color: language === 'en' ? '#fff' : 'var(--t3)',
-                  padding: '5px 12px',
-                  borderRadius: '15px',
+                  width: '58px',
+                  height: '28px',
+                  borderRadius: '25px',
                   fontSize: '11px',
-                  fontWeight: '700',
+                  fontWeight: '800',
                   cursor: 'pointer',
                   fontFamily: 'inherit',
-                  transition: 'all 0.2s ease',
-                  boxShadow: language === 'en' ? 'var(--s0)' : 'none'
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: language === 'en' ? '0 2px 8px rgba(27, 94, 55, 0.22)' : 'none'
                 }}
               >
                 EN
@@ -174,14 +178,18 @@ export default function AppLayout({ currentTab, setCurrentTab, language, setLang
                   border: 'none',
                   background: language === 'mr' ? 'var(--brand)' : 'transparent',
                   color: language === 'mr' ? '#fff' : 'var(--t3)',
-                  padding: '5px 12px',
-                  borderRadius: '15px',
+                  width: '58px',
+                  height: '28px',
+                  borderRadius: '25px',
                   fontSize: '11px',
-                  fontWeight: '700',
+                  fontWeight: '800',
                   cursor: 'pointer',
                   fontFamily: 'inherit',
-                  transition: 'all 0.2s ease',
-                  boxShadow: language === 'mr' ? 'var(--s0)' : 'none'
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: language === 'mr' ? '0 2px 8px rgba(27, 94, 55, 0.22)' : 'none'
                 }}
               >
                 मराठी
