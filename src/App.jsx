@@ -149,7 +149,7 @@ export default function App() {
               }
             },
             {
-              element: '.lang-toggle',
+              element: '.lang-switcher-pill',
               popover: {
                 title: language === 'en' ? 'Bilingual Support' : 'द्विभाषिक समर्थन',
                 description: language === 'en' ? 'Tap here to instantly switch between English and Marathi.' : 'इंग्रजी आणि मराठी दरम्यान त्वरित बदलण्यासाठी येथे टॅप करा.',
