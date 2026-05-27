@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AppLayout from './components/AppLayout';
 import Dashboard from './components/Dashboard';
 import WeatherMetrics from './components/WeatherMetrics';
@@ -124,11 +124,22 @@ export default function App() {
   };
 
   // Interactive Tutorial
+  const tourLaunched = useRef(false);
+
   useEffect(() => {
+    // Sync ref when session is cleared
+    if (!farmerProfile) {
+      tourLaunched.current = false;
+    }
+
     if (farmerProfile && !isEditingProfile && currentTab === 'dashboard') {
       const hasSeenTutorial = localStorage.getItem('hasSeenTutorial');
-      if (!hasSeenTutorial) {
+      if (!hasSeenTutorial && !tourLaunched.current) {
+        tourLaunched.current = true; // Lock further re-triggers during this session
         const isDesktop = window.innerWidth > 768;
+        
+        // Dynamically align welcome steps with the language the farmer selected during onboarding
+        const activeLang = farmerProfile.language || language;
         
         const d = driver({
           showProgress: true,
@@ -137,32 +148,32 @@ export default function App() {
             {
               element: '.user-profile',
               popover: {
-                title: language === 'en' ? 'Welcome to Agro Heal! 🌿' : 'Agro Heal मध्ये आपले स्वागत आहे! 🌿',
-                description: language === 'en' ? 'Let me show you around your new smart farming assistant.' : 'मी तुम्हाला तुमच्या नवीन स्मार्ट फार्मिंग असिस्टंटची ओळख करून देतो.',
+                title: activeLang === 'en' ? 'Welcome to Agro Heal! 🌿' : 'Agro Heal मध्ये आपले स्वागत आहे! 🌿',
+                description: activeLang === 'en' ? 'Let me show you around your new smart farming assistant.' : 'मी तुम्हाला तुमच्या नवीन स्मार्ट फार्मिंग असिस्टंटची ओळख करून देतो.',
                 side: "bottom", align: 'start'
               }
             },
             {
               element: '.lang-switcher-pill',
               popover: {
-                title: language === 'en' ? 'Bilingual Support' : 'द्विभाषिक समर्थन',
-                description: language === 'en' ? 'Tap here to instantly switch between English and Marathi.' : 'इंग्रजी आणि मराठी दरम्यान त्वरित बदलण्यासाठी येथे टॅप करा.',
+                title: activeLang === 'en' ? 'Bilingual Support' : 'द्विभाषिक समर्थन',
+                description: activeLang === 'en' ? 'Tap here to instantly switch between English and Marathi.' : 'इंग्रजी आणि मराठी दरम्यान त्वरित बदलण्यासाठी येथे टॅप करा.',
                 side: "bottom", align: 'end'
               }
             },
             {
               element: isDesktop ? '.sidebar-nav' : '.mobile-bottom-nav',
               popover: {
-                title: language === 'en' ? 'Navigation Menu' : 'नेव्हिगेशन मेनू',
-                description: language === 'en' ? 'Use these tabs to check APMC Rates, Live Weather, and read the latest Farming News.' : 'APMC दर, थेट हवामान तपासण्यासाठी आणि ताज्या शेतीच्या बातम्या वाचण्यासाठी या टॅबचा वापर करा.',
+                title: activeLang === 'en' ? 'Navigation Menu' : 'नेव्हिगेशन मेनू',
+                description: activeLang === 'en' ? 'Use these tabs to check APMC Rates, Live Weather, and read the latest Farming News.' : 'APMC दर, थेट हवामान तपासण्यासाठी आणि ताज्या शेतीच्या बातम्या वाचण्यासाठी या टॅबचा वापर करा.',
                 side: isDesktop ? "right" : "top"
               }
             },
             {
               element: isDesktop ? '.sidebar-scan-btn' : '.nav-fab-wrapper',
               popover: {
-                title: language === 'en' ? 'Smart AI Scanner 📸' : 'स्मार्ट AI स्कॅनर 📸',
-                description: language === 'en' ? 'This is the most powerful tool! Tap here to scan crops for diseases or consult the AI Livestock Vet.' : 'हे सर्वात शक्तिशाली साधन आहे! रोगांसाठी पिके स्कॅन करण्यासाठी किंवा AI पशूवैद्याचा सल्ला घेण्यासाठी येथे टॅप करा.',
+                title: activeLang === 'en' ? 'Smart AI Scanner 📸' : 'स्मार्ट AI स्कॅनर 📸',
+                description: activeLang === 'en' ? 'This is the most powerful tool! Tap here to scan crops for diseases or consult the AI Livestock Vet.' : 'हे सर्वात शक्तिशाली साधन आहे! रोगांसाठी पिके स्कॅन करण्यासाठी किंवा AI पशूवैद्याचा सल्ला घेण्यासाठी येथे टॅप करा.',
                 side: isDesktop ? "right" : "top"
               }
             }
@@ -184,7 +195,7 @@ export default function App() {
         }, 1200); // 1.2s delay to ensure full layout rendering
       }
     }
-  }, [farmerProfile, isEditingProfile, language, currentTab]);
+  }, [farmerProfile, isEditingProfile, currentTab]);
 
   const clearLogs = () => {
     setLogs([]);
