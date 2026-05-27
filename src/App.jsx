@@ -173,12 +173,9 @@ export default function App() {
               }
             }
           ],
-          onDestroyStarted: () => {
-            if (!d.hasNextStep() || window.confirm(language === 'en' ? "Skip the tutorial?" : "ट्यूटोरियल वगळा?")) {
-              d.destroy();
-              localStorage.setItem('hasSeenTutorial', 'true');
-            }
-          },
+          onDestroyed: () => {
+            localStorage.setItem('hasSeenTutorial', 'true');
+          }
         });
         
         setTimeout(() => {
