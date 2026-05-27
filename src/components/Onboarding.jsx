@@ -158,13 +158,51 @@ export default function Onboarding({ onComplete }) {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: platform.toLowerCase(),
-        options: {
-          redirectTo: window.location.origin
+      if (platform.toLowerCase() === 'apple') {
+        // PREMIUM STUDENT SIMULATION: Bypasses the $99 fee for demo purposes
+        await new Promise(resolve => setTimeout(resolve, 1200)); // Premium visual loader
+        
+        const simulatedUsername = 'sso_apple_user';
+        const storedProfileKey = `farmerProfile_${simulatedUsername}`;
+        const existingProfile = localStorage.getItem(storedProfileKey);
+
+        if (existingProfile) {
+          const parsed = JSON.parse(existingProfile);
+          localStorage.setItem('farmerProfile', JSON.stringify(parsed));
+          onComplete(parsed);
+        } else {
+          const ssoProfile = {
+            name: 'Apple Farmer',
+            phone: '9876543210',
+            district: 'Nagpur',
+            districtMr: 'नागपूर',
+            region: 'Vidarbha',
+            regionMr: 'विदर्भ',
+            crop: 'Soybean',
+            cropMr: 'सोयाबीन',
+            crops: ['Soybean', 'Cotton'],
+            cropsData: [
+              { id: 'Soybean', nameMr: 'सोयाबीन', emoji: '🌾' },
+              { id: 'Cotton', nameMr: 'कापूस', emoji: '🌾' }
+            ],
+            language: lang,
+            id: 'sso-local-only'
+          };
+          
+          localStorage.setItem(storedProfileKey, JSON.stringify(ssoProfile));
+          localStorage.setItem('farmerProfile', JSON.stringify(ssoProfile));
+          onComplete(ssoProfile);
         }
-      });
-      if (error) throw error;
+      } else {
+        // REAL GOOGLE AUTHENTICATION
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin
+          }
+        });
+        if (error) throw error;
+      }
     } catch (err) {
       console.error(err);
       setError(lang === 'en' ? `Failed to log in with ${platform}.` : `${platform} द्वारे लॉगिन अयशस्वी.`);
@@ -448,18 +486,6 @@ export default function Onboarding({ onComplete }) {
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                 </svg>
                 <span>{lang === 'en' ? 'Sign in with Google' : 'Google द्वारे लॉगिन करा'}</span>
-              </button>
-
-              <button
-                type="button"
-                className="social-btn apple"
-                disabled={isSubmitting}
-                onClick={() => handleSocialAuth('Apple')}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px' }}>
-                  <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.48C4.25 17 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.1 16.67C20.08 16.74 19.67 18.11 18.71 19.5M15.97 4.17C16.63 3.37 17.07 2.28 16.95 1C16 1.04 14.9 1.6 14.24 2.38C13.68 3.04 13.19 4.14 13.34 5.39C14.39 5.47 15.4 4.88 15.97 4.17Z" />
-                </svg>
-                <span>{lang === 'en' ? 'Sign in with Apple' : 'Apple द्वारे लॉगिन करा'}</span>
               </button>
             </div>
           </div>
