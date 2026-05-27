@@ -47,6 +47,27 @@ export default function Onboarding({ onComplete }) {
     { id: 'Turmeric',  nameEn: 'Turmeric',  nameMr: 'हळद',    img: '/crops/turmeric.png' },
   ];
 
+  // Auto-detect active Supabase session on mount (crucial for OAuth redirect success)
+  useEffect(() => {
+    const checkActiveSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setActiveUser(session.user.id);
+          const storedProfileKey = `farmerProfile_${session.user.id}`;
+          const existingProfile = localStorage.getItem(storedProfileKey);
+          
+          if (!existingProfile) {
+            setStep('profile');
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to retrieve OAuth session on mount:", err);
+      }
+    };
+    checkActiveSession();
+  }, []);
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!username.trim() || !password) {
