@@ -204,6 +204,7 @@ export default function App() {
   // Reset/Clear profile for demo testing
   const resetFarmerProfile = async () => {
     localStorage.removeItem('farmerProfile');
+    localStorage.removeItem('hasSeenTutorial'); // Clear tutorial history so it triggers on next login!
     try {
       await supabase.auth.signOut();
     } catch (e) {
