@@ -135,16 +135,10 @@ export default function App() {
           animate: true,
           steps: [
             {
+              element: '.user-profile',
               popover: {
                 title: language === 'en' ? 'Welcome to Agro Heal! 🌿' : 'Agro Heal मध्ये आपले स्वागत आहे! 🌿',
                 description: language === 'en' ? 'Let me show you around your new smart farming assistant.' : 'मी तुम्हाला तुमच्या नवीन स्मार्ट फार्मिंग असिस्टंटची ओळख करून देतो.',
-              }
-            },
-            {
-              element: '.user-profile',
-              popover: {
-                title: language === 'en' ? 'Your Profile' : 'तुमचे प्रोफाईल',
-                description: language === 'en' ? 'Click here anytime to edit your profile, update your district, or change your primary crop.' : 'तुमचे प्रोफाईल संपादित करण्यासाठी, जिल्हा अपडेट करण्यासाठी किंवा मुख्य पीक बदलण्यासाठी येथे क्लिक करा.',
                 side: "bottom", align: 'start'
               }
             },
@@ -175,12 +169,19 @@ export default function App() {
           ],
           onDestroyed: () => {
             localStorage.setItem('hasSeenTutorial', 'true');
+            addLog('[Tour Engine] Interactive tutorial completed and saved.', 'success');
           }
         });
         
         setTimeout(() => {
-          d.drive();
-        }, 800);
+          try {
+            addLog('[Tour Engine] Launching interactive tutorial...', 'info');
+            d.drive();
+          } catch (err) {
+            addLog(`[Tour Engine Error] Failed to launch tour: ${err.message}`, 'error');
+            console.error("Driver.js error:", err);
+          }
+        }, 1200); // 1.2s delay to ensure full layout rendering
       }
     }
   }, [farmerProfile, isEditingProfile, language, currentTab]);
