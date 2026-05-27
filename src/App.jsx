@@ -292,7 +292,19 @@ export default function App() {
       case 'news':
         return <News language={language} apiKey={apiKey} addLog={addLog} farmerProfile={farmerProfile} />;
       case 'admin':
-        return <AdminDashboard onClose={() => setCurrentTab('dashboard')} />;
+        return (
+          <AdminDashboard 
+            onClose={() => setCurrentTab('dashboard')} 
+            apiKey={apiKey}
+            setApiKey={setApiKey}
+            simulatedMode={simulatedMode}
+            setSimulatedMode={setSimulatedMode}
+            logs={logs}
+            clearLogs={clearLogs}
+            resetFarmerProfile={resetFarmerProfile}
+            farmerProfile={farmerProfile}
+          />
+        );
       default:
         return <Dashboard setCurrentTab={setCurrentTab} language={language} farmerProfile={farmerProfile} />;
     }
