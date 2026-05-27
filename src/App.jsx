@@ -42,37 +42,78 @@ export default function App() {
   const [editCrops, setEditCrops] = useState([]); // multi-select
   const [editSaved, setEditSaved] = useState(false);
 
-  // Initialize and check local storage
+  // Initialize and check local storage & Supabase Auth session
   useEffect(() => {
     addLog('System Initialization Successful.', 'success');
     addLog('Agro Heal engine successfully initialized on Port 5174.', 'info');
     
-    // Check if farmer profile exists
-    const storedProfile = localStorage.getItem('farmerProfile');
-    if (storedProfile) {
-      try {
-        const parsed = JSON.parse(storedProfile);
+    // Listen for Auth changes in Supabase
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        addLog(`[Auth] Active session verified for: ${session.user.email}`, 'success');
         
-        // Defensive check: If the profile is missing crucial new fields (like district or crop),
-        // it means it's an old incompatible mock profile from earlier testing. Reset it!
-        if (!parsed.name || !parsed.district || (!parsed.crop && !parsed.crops)) {
-          throw new Error("Corrupted or outdated profile structure.");
-        }
+        // Try loading profile corresponding to this Supabase user ID
+        const storedProfileKey = `farmerProfile_${session.user.id}`;
+        const existingProfile = localStorage.getItem(storedProfileKey);
         
-        setFarmerProfile(parsed);
-        if (parsed.language) {
-          setLanguage(parsed.language);
+        if (existingProfile) {
+          try {
+            const parsed = JSON.parse(existingProfile);
+            setFarmerProfile(parsed);
+            localStorage.setItem('farmerProfile', JSON.stringify(parsed));
+            if (parsed.language) setLanguage(parsed.language);
+          } catch (e) {
+            setFarmerProfile(null);
+          }
+        } else {
+          // If no local record, check Supabase 'farmers' table
+          try {
+            const { data, error } = await supabase
+              .from('farmers')
+              .select('*')
+              .eq('phone', session.user.id)
+              .maybeSingle();
+              
+            if (data) {
+              const profile = {
+                id: data.id,
+                name: data.name,
+                phone: session.user.id,
+                district: data.district,
+                crop: data.crop,
+                crops: [data.crop],
+                language: data.language
+              };
+              localStorage.setItem(storedProfileKey, JSON.stringify(profile));
+              localStorage.setItem('farmerProfile', JSON.stringify(profile));
+              setFarmerProfile(profile);
+            } else {
+              // Redirect to profile setup
+              setFarmerProfile(null);
+            }
+          } catch (err) {
+            setFarmerProfile(null);
+          }
         }
-        addLog(`[Profile Engine] Loaded profile for ${parsed.name} (${parsed.district}).`, 'success');
-      } catch (err) {
-        console.warn('Clearing corrupted local profile data:', err.message);
-        localStorage.removeItem('farmerProfile');
-        setFarmerProfile(null);
-        addLog('[Profile Engine] Corrupted profile cleared. Launching Onboarding Wizard...', 'error');
+      } else {
+        // Fallback for mock accounts / local storage
+        const storedProfile = localStorage.getItem('farmerProfile');
+        if (storedProfile) {
+          try {
+            const parsed = JSON.parse(storedProfile);
+            setFarmerProfile(parsed);
+            if (parsed.language) setLanguage(parsed.language);
+          } catch (e) {
+            localStorage.removeItem('farmerProfile');
+            setFarmerProfile(null);
+          }
+        }
       }
-    } else {
-      addLog('[Profile Engine] No active farmer profile found. Launching Onboarding Wizard...', 'warning');
-    }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // System log append helper
@@ -163,8 +204,13 @@ export default function App() {
   };
 
   // Reset/Clear profile for demo testing
-  const resetFarmerProfile = () => {
+  const resetFarmerProfile = async () => {
     localStorage.removeItem('farmerProfile');
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.warn("Supabase signout failed:", e);
+    }
     setFarmerProfile(null);
     setCurrentTab('dashboard');
     addLog('[Profile Engine] Farmer profile has been reset. Returning to Onboarding...', 'warning');

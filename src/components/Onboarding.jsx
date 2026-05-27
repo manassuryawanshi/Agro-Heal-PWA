@@ -136,32 +136,16 @@ export default function Onboarding({ onComplete }) {
     setIsSubmitting(true);
 
     try {
-      // Stunning animated loading simulation for premium feel
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const simulatedUsername = `sso_${platform.toLowerCase()}_user`;
-      const accounts = getLocalAccounts();
-      
-      if (!accounts[simulatedUsername]) {
-        accounts[simulatedUsername] = 'sso_bypass_auth_key';
-        saveLocalAccounts(accounts);
-      }
-      
-      setActiveUser(simulatedUsername);
-      const storedProfileKey = `farmerProfile_${simulatedUsername}`;
-      const existingProfile = localStorage.getItem(storedProfileKey);
-
-      if (existingProfile) {
-        const parsed = JSON.parse(existingProfile);
-        localStorage.setItem('farmerProfile', JSON.stringify(parsed));
-        onComplete(parsed);
-      } else {
-        setStep('profile');
-      }
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: platform.toLowerCase(),
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (error) throw error;
     } catch (err) {
       console.error(err);
       setError(lang === 'en' ? `Failed to log in with ${platform}.` : `${platform} द्वारे लॉगिन अयशस्वी.`);
-    } finally {
       setIsSubmitting(false);
     }
   };
