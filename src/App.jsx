@@ -125,11 +125,15 @@ export default function App() {
 
   // Interactive Tutorial
   const tourLaunched = useRef(false);
+  const currentStepRef = useRef(-1);
+  const activeDriverRef = useRef(null);
 
   useEffect(() => {
     // Sync ref when session is cleared
     if (!farmerProfile) {
       tourLaunched.current = false;
+      currentStepRef.current = -1;
+      activeDriverRef.current = null;
     }
 
     if (farmerProfile && !isEditingProfile && currentTab === 'dashboard') {
@@ -178,11 +182,20 @@ export default function App() {
               }
             }
           ],
+          onHighlightStarted: (element, step, { activeIndex }) => {
+            currentStepRef.current = activeIndex;
+          },
           onDestroyed: () => {
-            localStorage.setItem('hasSeenTutorial', 'true');
-            addLog('[Tour Engine] Interactive tutorial completed and saved.', 'success');
+            if (currentStepRef.current === 3) {
+              localStorage.setItem('hasSeenTutorial', 'true');
+              addLog('[Tour Engine] Interactive tutorial completed and saved.', 'success');
+            }
+            currentStepRef.current = -1;
+            activeDriverRef.current = null;
           }
         });
+        
+        activeDriverRef.current = d;
         
         setTimeout(() => {
           try {
@@ -196,6 +209,73 @@ export default function App() {
       }
     }
   }, [farmerProfile, isEditingProfile, currentTab]);
+
+  // Handle real-time dynamic tour translation mid-step on language toggle!
+  useEffect(() => {
+    if (farmerProfile && currentStepRef.current !== -1 && activeDriverRef.current) {
+      const activeIndex = currentStepRef.current;
+      activeDriverRef.current.destroy();
+
+      const isDesktop = window.innerWidth > 768;
+
+      const d = driver({
+        showProgress: true,
+        animate: true,
+        steps: [
+          {
+            element: '.user-profile',
+            popover: {
+              title: language === 'en' ? 'Welcome to Agro Heal! 🌿' : 'Agro Heal मध्ये आपले स्वागत आहे! 🌿',
+              description: language === 'en' ? 'Let me show you around your new smart farming assistant.' : 'मी तुम्हाला तुमच्या नवीन स्मार्ट फार्मिंग असिस्टंटची ओळख करून देतो.',
+              side: "bottom", align: 'start'
+            }
+          },
+          {
+            element: '.lang-switcher-pill',
+            popover: {
+              title: language === 'en' ? 'Bilingual Support' : 'द्विभाषिक समर्थन',
+              description: language === 'en' ? 'Tap here to instantly switch between English and Marathi.' : 'इंग्रजी आणि मराठी दरम्यान त्वरित बदलण्यासाठी येथे टॅप करा.',
+              side: "bottom", align: 'end'
+            }
+          },
+          {
+            element: isDesktop ? '.sidebar-nav' : '.mobile-bottom-nav',
+            popover: {
+              title: language === 'en' ? 'Navigation Menu' : 'नेव्हिगेशन मेनू',
+              description: language === 'en' ? 'Use these tabs to check APMC Rates, Live Weather, and read the latest Farming News.' : 'APMC दर, थेट हवामान तपासण्यासाठी आणि ताज्या शेतीच्या बातम्या वाचण्यासाठी या टॅबचा वापर करा.',
+              side: isDesktop ? "right" : "top"
+            }
+          },
+          {
+            element: isDesktop ? '.sidebar-scan-btn' : '.nav-fab-wrapper',
+            popover: {
+              title: language === 'en' ? 'Smart AI Scanner 📸' : 'स्मार्ट AI स्कॅनर 📸',
+              description: language === 'en' ? 'This is the most powerful tool! Tap here to scan crops for diseases or consult the AI Livestock Vet.' : 'हे सर्वात शक्तिशाली साधन आहे! रोगांसाठी पिके स्कॅन करण्यासाठी किंवा AI पशूवैद्याचा सल्ला घेण्यासाठी येथे टॅप करा.',
+              side: isDesktop ? "right" : "top"
+            }
+          }
+        ],
+        onHighlightStarted: (element, step, { activeIndex }) => {
+          currentStepRef.current = activeIndex;
+        },
+        onDestroyed: () => {
+          if (currentStepRef.current === 3) {
+            localStorage.setItem('hasSeenTutorial', 'true');
+            addLog('[Tour Engine] Interactive tutorial completed and saved.', 'success');
+          }
+          currentStepRef.current = -1;
+          activeDriverRef.current = null;
+        }
+      });
+
+      activeDriverRef.current = d;
+
+      setTimeout(() => {
+        d.drive(activeIndex);
+        addLog(`[Tour Engine] Dynamic tour translated instantly to: ${language.toUpperCase()}`, 'success');
+      }, 100);
+    }
+  }, [language]);
 
   const clearLogs = () => {
     setLogs([]);
