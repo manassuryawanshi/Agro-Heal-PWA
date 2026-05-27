@@ -147,10 +147,46 @@ export default function AppLayout({ currentTab, setCurrentTab, language, setLang
                 <p>{language === 'en' ? `${farmerProfile.district}, MH` : `${farmerProfile.districtMr}, महा.`}</p>
               </div>
             </div>
-            <button className="lang-toggle" onClick={() => setLanguage(l => l === 'en' ? 'mr' : 'en')}>
-              <Globe size={13} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-              {language === 'en' ? 'मराठी' : 'English'}
-            </button>
+            <div className="lang-switcher-pill" style={{ display: 'flex', background: 'var(--sunken)', borderRadius: '20px', padding: '2px', gap: '2px' }}>
+              <button 
+                type="button" 
+                onClick={() => setLanguage('en')}
+                style={{
+                  border: 'none',
+                  background: language === 'en' ? 'var(--brand)' : 'transparent',
+                  color: language === 'en' ? '#fff' : 'var(--t3)',
+                  padding: '5px 12px',
+                  borderRadius: '15px',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  transition: 'all 0.2s ease',
+                  boxShadow: language === 'en' ? 'var(--s0)' : 'none'
+                }}
+              >
+                EN
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setLanguage('mr')}
+                style={{
+                  border: 'none',
+                  background: language === 'mr' ? 'var(--brand)' : 'transparent',
+                  color: language === 'mr' ? '#fff' : 'var(--t3)',
+                  padding: '5px 12px',
+                  borderRadius: '15px',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  transition: 'all 0.2s ease',
+                  boxShadow: language === 'mr' ? 'var(--s0)' : 'none'
+                }}
+              >
+                मराठी
+              </button>
+            </div>
           </header>
         )}
         

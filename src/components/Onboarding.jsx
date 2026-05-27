@@ -29,6 +29,7 @@ export default function Onboarding({ onComplete }) {
 
   // Profile State
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [district, setDistrict] = useState('');
   const [crops, setCrops] = useState([]); // multi-select array
   const [activeUser, setActiveUser] = useState(''); // Current logged-in username
@@ -184,6 +185,10 @@ export default function Onboarding({ onComplete }) {
       setError(lang === 'en' ? 'Please enter your name.' : 'कृपया आपले नाव टाका.');
       return;
     }
+    if (!phone.trim() || phone.length < 10) {
+      setError(lang === 'en' ? 'Please enter a valid 10-digit mobile number.' : 'कृपया वैध १० अंकी मोबाईल नंबर टाका.');
+      return;
+    }
     if (!district) {
       setError(lang === 'en' ? 'Please select your district.' : 'कृपया आपला जिल्हा निवडा.');
       return;
@@ -199,7 +204,7 @@ export default function Onboarding({ onComplete }) {
 
     const profile = {
       name: name.trim(),
-      phone: activeUser.startsWith('sso_') ? '' : activeUser,
+      phone: phone.trim(),
       district,
       districtMr: selectedDistObj ? selectedDistObj.nameMr : district,
       region: selectedDistObj ? selectedDistObj.region : '',
@@ -473,6 +478,20 @@ export default function Onboarding({ onComplete }) {
                 placeholder={lang === 'en' ? 'Enter full name (e.g. Sachin Patil)' : 'पूर्ण नाव टाका (उदा. सचिन पाटील)'}
                 value={name}
                 onChange={(e) => { setName(e.target.value); setError(''); }}
+              />
+            </div>
+
+            <div className="input-group">
+              <label>
+                <Phone size={14} />
+                <span>{lang === 'en' ? 'Mobile Number' : 'मोबाईल नंबर'}</span>
+              </label>
+              <input
+                type="tel"
+                maxLength="10"
+                placeholder={lang === 'en' ? 'Enter 10-digit mobile number' : '१० अंकी मोबाईल नंबर टाका'}
+                value={phone}
+                onChange={(e) => { setPhone(e.target.value); setError(''); }}
               />
             </div>
 
