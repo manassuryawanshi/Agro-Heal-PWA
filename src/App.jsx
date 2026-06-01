@@ -42,6 +42,13 @@ export default function App() {
   const [editCrops, setEditCrops] = useState([]); // multi-select
   const [editSaved, setEditSaved] = useState(false);
 
+  // Weather integration states (lifted up)
+  const [selectedDistrictId, setSelectedDistrictId] = useState('Akola');
+  const [weatherData, setWeatherData] = useState(null);
+  const [forecastData, setForecastData] = useState([]);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherError, setWeatherError] = useState(null);
+
   // Initialize and check local storage & Supabase Auth session
   useEffect(() => {
     addLog('System Initialization Successful.', 'success');
@@ -277,6 +284,96 @@ export default function App() {
     }
   }, [language]);
 
+  // Keep selectedDistrictId in sync with farmerProfile's district
+  useEffect(() => {
+    if (farmerProfile?.district) {
+      setSelectedDistrictId(farmerProfile.district);
+    }
+  }, [farmerProfile?.district]);
+
+  // Lifted Weather Fetch Effect
+  useEffect(() => {
+    if (!selectedDistrictId) return;
+    
+    const fetchWeatherAndForecast = async () => {
+      setWeatherLoading(true);
+      setWeatherError(null);
+      
+      const activeDistrict = maharashtraDistricts.find(d => d.id === selectedDistrictId) || maharashtraDistricts[0];
+      addLog(`[Weather API] Initiating live weather & 7-day forecast fetch for ${activeDistrict.name}...`, 'info');
+      
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${activeDistrict.lat}&longitude=${activeDistrict.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m&hourly=soil_temperature_6cm,soil_moisture_3_to_9cm&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max&timezone=auto`;
+        
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('API response error');
+        
+        const data = await res.json();
+        
+        // Grab current and soil values
+        const current = data.current;
+        const soilTemp = data.hourly?.soil_temperature_6cm?.[0] || (current.temperature_2m - 1.5);
+        const soilMoist = data.hourly?.soil_moisture_3_to_9cm?.[0] || 0.28;
+
+        setWeatherData({
+          temp: Math.round(current.temperature_2m),
+          humidity: Math.round(current.relative_humidity_2m),
+          rain: current.precipitation,
+          windSpeed: Math.round(current.wind_speed_10m),
+          soilTemp: Math.round(soilTemp),
+          soilMoisture: Math.round(soilMoist * 100) // Convert to percentage
+        });
+
+        // Parse daily forecast data
+        const daily = data.daily;
+        const formattedForecast = daily.time.map((timeStr, index) => ({
+          date: timeStr,
+          tempMax: Math.round(daily.temperature_2m_max[index]),
+          tempMin: Math.round(daily.temperature_2m_min[index]),
+          rainSum: daily.precipitation_sum[index],
+          windMax: Math.round(daily.wind_speed_10m_max[index])
+        }));
+
+        setForecastData(formattedForecast);
+        addLog(`[Weather API] Loaded current conditions & 7-day forecast successfully!`, 'success');
+      } catch (err) {
+        addLog(`[Weather API] Fetch failed. Reverting to high-fidelity simulated fallback.`, 'warning');
+        // Simulated local fallback on network failure
+        setWeatherData({
+          temp: 36,
+          humidity: 58,
+          rain: 0,
+          windSpeed: 9,
+          soilTemp: 32,
+          soilMoisture: 33
+        });
+
+        // 7-day realistic summer/monsoon projection for Maharashtra
+        const today = new Date();
+        const fallbackForecast = Array.from({ length: 7 }).map((_, idx) => {
+          const nextDate = new Date(today);
+          nextDate.setDate(today.getDate() + idx);
+          const dateString = nextDate.toISOString().split('T')[0];
+          
+          return {
+            date: dateString,
+            tempMax: 35 + Math.floor(Math.sin(idx) * 3),
+            tempMin: 25 + Math.floor(Math.cos(idx) * 2),
+            rainSum: idx === 3 ? 12 : idx === 4 ? 6 : 0, // Mock rainfall on day 4 & 5
+            windMax: 10 + Math.floor(Math.sin(idx) * 6)
+          };
+        });
+        
+        setForecastData(fallbackForecast);
+        setWeatherError(err.message);
+      } finally {
+        setWeatherLoading(false);
+      }
+    };
+
+    fetchWeatherAndForecast();
+  }, [selectedDistrictId]);
+
   const clearLogs = () => {
     setLogs([]);
     addLog('Developer console logs cleared.', 'info');
@@ -370,9 +467,29 @@ export default function App() {
 
     switch (currentTab) {
       case 'dashboard':
-        return <Dashboard setCurrentTab={setCurrentTab} language={language} farmerProfile={farmerProfile} />;
+        return (
+          <Dashboard 
+            setCurrentTab={setCurrentTab} 
+            language={language} 
+            farmerProfile={farmerProfile} 
+            weatherData={weatherData} 
+            weatherLoading={weatherLoading} 
+          />
+        );
       case 'weather':
-        return <WeatherMetrics language={language} addLog={addLog} farmerProfile={farmerProfile} />;
+        return (
+          <WeatherMetrics 
+            language={language} 
+            addLog={addLog} 
+            farmerProfile={farmerProfile} 
+            selectedDistrictId={selectedDistrictId}
+            setSelectedDistrictId={setSelectedDistrictId}
+            weatherData={weatherData}
+            forecastData={forecastData}
+            weatherLoading={weatherLoading}
+            weatherError={weatherError}
+          />
+        );
       case 'crops':
         return <Crops language={language} apiKey={apiKey} simulatedMode={simulatedMode} addLog={addLog} farmerProfile={farmerProfile} />;
       case 'livestock':
@@ -396,7 +513,15 @@ export default function App() {
           />
         );
       default:
-        return <Dashboard setCurrentTab={setCurrentTab} language={language} farmerProfile={farmerProfile} />;
+        return (
+          <Dashboard 
+            setCurrentTab={setCurrentTab} 
+            language={language} 
+            farmerProfile={farmerProfile} 
+            weatherData={weatherData} 
+            weatherLoading={weatherLoading} 
+          />
+        );
     }
   };
 

@@ -4,12 +4,12 @@ import {
   CloudRain, Microscope, Stethoscope, IndianRupee, Rss,
   Info, LineChart, X, TrendingUp, Zap, ShieldCheck, Eye, PawPrint, Leaf
 } from 'lucide-react';
-import { cropDiseases, newsArticles } from '../data/mockData';
+import { cropDiseases, newsArticles, maharashtraDistricts } from '../data/mockData';
 import { fetchLiveApmcRates } from '../data/api';
 
 const L = (lang, en, mr) => lang === 'en' ? en : mr;
 
-export default function Dashboard({ setCurrentTab, language, farmerProfile }) {
+export default function Dashboard({ setCurrentTab, language, farmerProfile, weatherData, weatherLoading }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [showDrop, setShowDrop] = useState(false);
@@ -63,6 +63,9 @@ export default function Dashboard({ setCurrentTab, language, farmerProfile }) {
 
   const alert = farmerProfile ? getCropAlert(farmerProfile.crop) : null;
   const today = new Date().toLocaleDateString(language === 'en' ? 'en-US' : 'mr-IN', { weekday: 'long', month: 'short', day: 'numeric' });
+
+  const activeDistrictObj = maharashtraDistricts.find(d => d.id === farmerProfile?.district) || { name: farmerProfile?.district || 'Maharashtra', nameMr: farmerProfile?.districtMr || 'महाराष्ट्र' };
+  const districtName = L(language, activeDistrictObj.name, activeDistrictObj.nameMr);
 
   const quickActions = [
     { id: 'livestock', label: { en: 'Livestock', mr: 'पशूधन' }, icon: <PawPrint size={24} />, bg: 'rgba(124,45,18,0.08)', color: '#9A3412' },
@@ -118,19 +121,53 @@ export default function Dashboard({ setCurrentTab, language, farmerProfile }) {
             <div className="weather-widget-header">
               <div>
                 <MapPin size={12} color="rgba(255,255,255,0.65)" />
-                <span>{farmerProfile?.district || 'Maharashtra'}</span>
+                <span>{districtName}</span>
               </div>
               <span className="weather-widget-date">{today}</span>
             </div>
             <div className="weather-widget-main">
               <div className="weather-temp">
                 <ThermometerSun size={36} color="rgba(255,210,90,0.9)" strokeWidth={1.5} />
-                <div><span className="temp-value">34</span><span className="temp-unit">°C</span></div>
+                {weatherLoading && !weatherData ? (
+                  <div className="skeleton" style={{ width: 60, height: 44, borderRadius: 'var(--r-sm)', margin: '0 0 0 8px' }}></div>
+                ) : (
+                  <div>
+                    <span className="temp-value">{weatherData ? weatherData.temp : '34'}</span>
+                    <span className="temp-unit">°C</span>
+                  </div>
+                )}
               </div>
               <div className="weather-metrics-mini">
-                <div className="metric-mini"><Droplets size={11} /><span>45%</span></div>
-                <div className="metric-mini"><Wind size={11} /><span>12 km/h</span></div>
-                <div className="metric-mini"><CloudRain size={11} /><span>0 mm rain</span></div>
+                {weatherLoading && !weatherData ? (
+                  <>
+                    <div className="skeleton" style={{ width: 70, height: 22, borderRadius: 'var(--r-pill)', marginBottom: 4 }}></div>
+                    <div className="skeleton" style={{ width: 70, height: 22, borderRadius: 'var(--r-pill)', marginBottom: 4 }}></div>
+                    <div className="skeleton" style={{ width: 70, height: 22, borderRadius: 'var(--r-pill)' }}></div>
+                  </>
+                ) : (
+                  <>
+                    <div className="metric-mini">
+                      <Droplets size={11} />
+                      <span>{weatherData ? `${weatherData.humidity}%` : '45%'}</span>
+                    </div>
+                    <div className="metric-mini">
+                      <Wind size={11} />
+                      <span>
+                        {weatherData 
+                          ? L(language, `${weatherData.windSpeed} km/h`, `${weatherData.windSpeed} किमी/तास`) 
+                          : L(language, '12 km/h', '१२ किमी/तास')}
+                      </span>
+                    </div>
+                    <div className="metric-mini">
+                      <CloudRain size={11} />
+                      <span>
+                        {weatherData 
+                          ? L(language, `${weatherData.rain} mm rain`, `${weatherData.rain} मिमी पाऊस`) 
+                          : L(language, '0 mm rain', '० मिमी पाऊस')}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

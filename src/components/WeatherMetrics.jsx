@@ -2,94 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { CloudSun, Thermometer, Droplets, Wind, AlertTriangle, Info, Calendar, Map, CloudRain, MapPin } from 'lucide-react';
 import { maharashtraDistricts, regionalAdvisories } from '../data/mockData';
 
-export default function WeatherMetrics({ language, addLog, farmerProfile }) {
-  // Use farmer's profile district as initial state fallback to Akola
-  const [selectedDistrictId, setSelectedDistrictId] = useState(farmerProfile?.district || 'Akola');
-  const [weatherData, setWeatherData] = useState(null);
-  const [forecastData, setForecastData] = useState([]);
+export default function WeatherMetrics({ 
+  language, 
+  addLog, 
+  farmerProfile, 
+  selectedDistrictId, 
+  setSelectedDistrictId, 
+  weatherData, 
+  forecastData, 
+  weatherLoading, 
+  weatherError 
+}) {
   const [activeParamTab, setActiveParamTab] = useState('temp'); // 'temp' | 'rain' | 'wind'
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+
+  // Map weatherLoading to local loading flag
+  const loading = weatherLoading;
 
   // Find currently selected district details
   const activeDistrict = maharashtraDistricts.find(d => d.id === selectedDistrictId) || maharashtraDistricts[0];
-
-  useEffect(() => {
-    const fetchWeatherAndForecast = async () => {
-      setLoading(true);
-      setError(null);
-      addLog(`[Weather API] Initiating live weather & 7-day forecast fetch for ${activeDistrict.name}...`, 'info');
-      
-      try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${activeDistrict.lat}&longitude=${activeDistrict.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m&hourly=soil_temperature_6cm,soil_moisture_3_to_9cm&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max&timezone=auto`;
-        
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('API response error');
-        
-        const data = await res.json();
-        
-        // Grab current and soil values
-        const current = data.current;
-        const soilTemp = data.hourly?.soil_temperature_6cm?.[0] || (current.temperature_2m - 1.5);
-        const soilMoist = data.hourly?.soil_moisture_3_to_9cm?.[0] || 0.28;
-
-        setWeatherData({
-          temp: Math.round(current.temperature_2m),
-          humidity: Math.round(current.relative_humidity_2m),
-          rain: current.precipitation,
-          windSpeed: Math.round(current.wind_speed_10m),
-          soilTemp: Math.round(soilTemp),
-          soilMoisture: Math.round(soilMoist * 100) // Convert to percentage
-        });
-
-        // Parse daily forecast data
-        const daily = data.daily;
-        const formattedForecast = daily.time.map((timeStr, index) => ({
-          date: timeStr,
-          tempMax: Math.round(daily.temperature_2m_max[index]),
-          tempMin: Math.round(daily.temperature_2m_min[index]),
-          rainSum: daily.precipitation_sum[index],
-          windMax: Math.round(daily.wind_speed_10m_max[index])
-        }));
-
-        setForecastData(formattedForecast);
-        addLog(`[Weather API] Loaded current conditions & 7-day forecast successfully!`, 'success');
-      } catch (err) {
-        addLog(`[Weather API] Fetch failed. Reverting to high-fidelity simulated fallback.`, 'warning');
-        // Simulated local fallback on network failure
-        setWeatherData({
-          temp: 36,
-          humidity: 58,
-          rain: 0,
-          windSpeed: 9,
-          soilTemp: 32,
-          soilMoisture: 33
-        });
-
-        // 7-day realistic summer/monsoon projection for Maharashtra
-        const today = new Date();
-        const fallbackForecast = Array.from({ length: 7 }).map((_, idx) => {
-          const nextDate = new Date(today);
-          nextDate.setDate(today.getDate() + idx);
-          const dateString = nextDate.toISOString().split('T')[0];
-          
-          return {
-            date: dateString,
-            tempMax: 35 + Math.floor(Math.sin(idx) * 3),
-            tempMin: 25 + Math.floor(Math.cos(idx) * 2),
-            rainSum: idx === 3 ? 12 : idx === 4 ? 6 : 0, // Mock rainfall on day 4 & 5
-            windMax: 10 + Math.floor(Math.sin(idx) * 6)
-          };
-        });
-        
-        setForecastData(fallbackForecast);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWeatherAndForecast();
-  }, [selectedDistrictId]);
 
   // Date formatter helper supporting English and Marathi
   const formatDate = (dateStr, lang) => {
